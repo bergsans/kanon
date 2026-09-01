@@ -1,0 +1,67 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { FolderBoundaryDiagram } from "./illustrations/FolderBoundaryDiagram";
+import { InkByRole } from "./illustrations/InkByRole";
+import { ParchmentByRole } from "./illustrations/ParchmentByRole";
+import { SelectedStateSwatches } from "./illustrations/SelectedStateSwatches";
+import { ShadowSamples } from "./illustrations/ShadowSamples";
+
+<Meta title="Design guide/Principles" />
+
+# Parchment and ink
+
+A reading room for old texts, not a dashboard. Five rules hold it together.
+
+## 1. Paper and ink, nothing else
+
+Five paper tones, four inks, one accent, checked against WCAG 2.1. No dark mode.
+
+<ParchmentByRole />
+<InkByRole />
+
+Full breakdown: [Foundations/Color](?path=/docs/design-guide-foundations-color--docs).
+
+## 2. Serif is the collection's voice, sans is the app's
+
+Passage, quote, work title: serif. Button, label, metadata, year: sans. See
+[Foundations/Color](?path=/docs/design-guide-foundations-color--docs).
+
+## 3. Weight for a setting, fill for a narrowing
+
+A setting (text size, language, sort order): weight and an underline. A
+filter that narrows the question (genre, era): accent border and fill.
+
+<SelectedStateSwatches />
+
+The third column breaks the rule — see [Known issues](?path=/docs/design-guide-known-issues--docs).
+
+## 4. The accent marks, it doesn't decorate
+
+Red chalk: an active narrowing, a link, or the send button — never
+"clickable" in general, that's what outlines and underlines are for. "All
+subjects" is the rest state, so it's bold ink, not accent.
+
+## 5. Flat and square
+
+Every radius is zeroed in `@theme`; `rounded-full` survives only where shape
+carries meaning — a pulse, a progress bar, a map pin, plus one icon button
+(see [Known issues](?path=/docs/design-guide-known-issues--docs)). Shadows
+are tinted with ink, never gray.
+
+<ShadowSamples />
+
+## Three folders, one boundary
+
+<FolderBoundaryDiagram />
+
+The full rule is in `.claude/skills/canon-ui`.
+
+## The rest of the guide
+
+[Architecture](?path=/docs/design-guide-architecture--docs) ·
+[Foundations/Color](?path=/docs/design-guide-foundations-color--docs) ·
+[Foundations/Typography](?path=/docs/design-guide-foundations-typography--docs) ·
+[Foundations/Layout](?path=/docs/design-guide-foundations-layout--docs) ·
+[Patterns](?path=/docs/design-guide-patterns--docs) ·
+[Voice and tone](?path=/docs/design-guide-voice-and-tone--docs) ·
+[Accessibility](?path=/docs/design-guide-accessibility--docs) ·
+[Known issues](?path=/docs/design-guide-known-issues--docs)

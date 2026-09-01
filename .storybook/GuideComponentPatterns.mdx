@@ -1,0 +1,136 @@
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+import * as CopyButtonStories from "../src/app/components/ui/CopyButton.stories";
+import * as PassageAccordionStories from "../src/app/components/smart-compositions/PassageAccordion.stories";
+import * as SearchBoxStories from "../src/app/components/ui/SearchBox.stories";
+import * as SegmentedControlStories from "../src/app/components/ui/SegmentedControl.stories";
+import { FocusTreatmentSwatches } from "./illustrations/FocusTreatmentSwatches";
+import { GuideTable } from "./illustrations/GuideTable";
+import { PassageRowAnatomy } from "./illustrations/PassageRowAnatomy";
+import { SearchStateFlow } from "./illustrations/SearchStateFlow";
+
+<Meta title="Design guide/Patterns" />
+
+# Component patterns
+
+## The result row
+
+The app's most important view. The numbers give each part a name to use when
+asking for a change.
+
+<PassageRowAnatomy />
+
+A list is never a card: `divide-y divide-parchment-200 border-t-2 border-accent-600`,
+with no shadow. Results, skeletons and projects all use this pattern.
+
+<Story of={PassageAccordionStories.Open} />
+
+## A search, step by step
+
+<SearchStateFlow />
+
+The skeleton takes the same shape as the rows it is waiting for, so the page
+changes layout once, not twice. The first row opens by itself once the answer
+arrives.
+
+## Links and buttons
+
+The default control is a text link with a dotted underline that turns
+`accent-700` on hover:
+`underline decoration-dotted underline-offset-4 hover:text-accent-700`.
+
+<Story of={CopyButtonStories.Default} />
+
+A solid accent button marks the action that commits something: sending the
+question, saving a project field. Two sizes exist, `px-4 py-2 rounded-md` for
+the search submit and `px-2 py-1` with no radius for a project form's commit
+buttons — nothing in the source says why they differ, only that all of them
+share one disabled state, `disabled:bg-parchment-200 disabled:text-ink-400`.
+See [Known issues](?path=/docs/design-guide-known-issues--docs).
+
+## Setting or narrowing
+
+A setting is marked by weight and an accent line, with no fill:
+
+<Story of={SegmentedControlStories.TextSize} />
+
+A filter that narrows the search is marked by an accent border and fill:
+
+<Story of={SearchBoxStories.Filtered} />
+
+## Text fields
+
+Resting border `parchment-300`. On focus the border turns `accent-600`, and
+it is never an outline outside the field. Every field needs a `<label>` or
+`aria-label`, because a placeholder isn't read as a name.
+
+<FocusTreatmentSwatches />
+
+The search box and the project fields follow the rule. The corpus filter's
+translucent ring does not, see [Known issues](?path=/docs/design-guide-known-issues--docs).
+The `NavMenu` trigger is a button, so it uses the global focus ring.
+
+## Section headings
+
+Use the `.eyebrow` class (small caps) and add `.eyebrow-rule` for a trailing
+hairline. Never write out the utility classes by hand.
+
+## Loading, empty and error
+
+Three shapes carry a wait, matched to how long it takes.
+
+A skeleton shows before the first row is known — three placeholder registers
+in `CanonSearch`, one paragraph in `ContextSheet` — each the shape of what
+it's waiting for (`animate-pulse`, `motion-reduce:animate-none`,
+`aria-hidden`), so the page changes layout once, not twice.
+
+A label swap covers a click-triggered fetch that already sits next to its
+own button: `MoreFromWork` and `SimilarPassages` replace their own text
+rather than showing a separate spinner.
+
+A live status row covers the one wait long enough to need a running account
+of itself: `CanonSearch`'s busy row (`role="status"`), a pulsing dot
+(`animate-ping`), phase copy and a stopwatch that ticks once a second, not
+faster. See [Voice and tone](?path=/docs/design-guide-voice-and-tone--docs)
+for the phase copy itself.
+
+An empty result is always one short sentence that names a next step, see
+[Voice and tone](?path=/docs/design-guide-voice-and-tone--docs). An error is
+one of two shapes: a bordered, left-accented box for a page-level failure
+(`CanonSearch`'s `result.errorTitle`), or a plain `role="status"` sentence
+in `text-accent-700` for a smaller async failure (`ContextSheet`,
+`MoreFromWork`, `SimilarPassages`, the translation toggle).
+
+## Popovers and overlays
+
+Two shapes, not one shared component. A popover closes on an outside click
+or Escape — `NavMenu`'s two dropdowns, `ExportMenu`, `SaveToProject`. A
+modal or sheet also traps focus and returns it on close, using
+`useModalFocus` — `ContextSheet` and `CostTag`'s breakdown dialog. Neither
+family shares one implementation across all of its members yet, see
+[Known issues](?path=/docs/design-guide-known-issues--docs) for where the popover
+close logic and the two overlays' backdrops have already drifted apart.
+
+## Icons
+
+One drawn stroke, not a font glyph and not a library. `CloseIcon`'s
+`strokeWidth="1.6"`, `stroke="currentColor"` so it takes the color of
+whatever button wraps it, is the shared reference. A decorative icon is
+`aria-hidden`; the accessible name comes from the button's own text or its
+`aria-label`, never from the icon. See
+[Known issues](?path=/docs/design-guide-known-issues--docs) for the five stroke
+widths and three hover treatments currently in use instead of one.
+
+## Quick reference
+
+<GuideTable>
+
+| Do | Don't |
+| --- | --- |
+| Use `underline decoration-dotted underline-offset-4 hover:text-accent-700` for a text action | Draw a new link style per component |
+| Reserve `bg-accent-600` for the action that commits something | Use accent fill to mark a setting — weight and a line do that instead |
+| Give a text field a visible `accent-600` border on focus | Add a translucent ring on top of it |
+| Let the global `:focus-visible` rule carry the ring | Write a per-component focus style unless the control needs its own |
+| Trap focus and return it with `useModalFocus` for a new modal or sheet | Ship a new overlay without it |
+| State the consequence in a destructive confirmation | Ask only "Are you sure?" |
+
+</GuideTable>

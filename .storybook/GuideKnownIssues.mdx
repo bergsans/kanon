@@ -1,0 +1,95 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { BackdropCompare } from "./illustrations/BackdropCompare";
+import { ButtonMetrics } from "./illustrations/ButtonMetrics";
+import { GuideTable } from "./illustrations/GuideTable";
+import { IconButtonSwatches } from "./illustrations/IconButtonSwatches";
+
+<Meta title="Design guide/Known issues" />
+
+# Known issues
+
+Places where the code breaks a rule from the guide. This page describes what the
+code does today; fixing an item is a separate change. When you fix one, remove
+its row in the same diff.
+
+## Visual language
+
+<GuideTable>
+
+| Where | What | Breaks |
+| --- | --- | --- |
+| `NavMenu`, model and effort lists | The selected option differs by color alone | [Weight for a setting](?path=/docs/design-guide-principles--docs), WCAG 1.4.1 |
+| `CorpusBrowser`, filter field | Focus is a translucent ring (`ring-accent-600/30`), the style `SearchBox`'s comment argues against | [Text fields](?path=/docs/design-guide-patterns--docs) |
+| `PassageAccordion`, `NavMenu`, `/costs` | Ad hoc tints `ink-400/80`, `ink-600/60`, `ink-400/70` | [Ink by role](?path=/docs/design-guide-foundations-color--docs): `ink-400` is already the muted tone |
+| Icon-only buttons | Three different hover treatments, see below | One control, one look |
+| `CloseIcon` | 22px in the menu, 18px in the two dialogs | One control, one look |
+| Hand-drawn icons | Five stroke widths (1.3, 1.5, 1.6, 1.7, 1.75) with no rule | One control, one look |
+| `ChipRow`, `ProjectView`, `CostTag` | `.eyebrow` written out by hand, and `CostTag`'s copy has drifted to `font-medium` | [Section headings](?path=/docs/design-guide-patterns--docs) |
+| Delete actions | No destructive style, and only project deletion asks for confirmation | — |
+| `CostTag`'s info button | `rounded-full` on an icon button, not a pulse, a bar, or a pin | [Flat and square](?path=/docs/design-guide-principles--docs) |
+| `font-mono` | No `--font-mono` entry in `@theme`; the utility silently falls back to the browser default | [Type scale](?path=/docs/design-guide-foundations-color--docs) |
+| `SearchBox`'s submit vs. `ProjectHeader`/`SaveToProject`/`ProjectView`'s commit buttons | Two solid-button sizes and radii, with no stated reason they differ | [Links and buttons](?path=/docs/design-guide-patterns--docs) |
+
+</GuideTable>
+
+<IconButtonSwatches />
+
+<ButtonMetrics />
+
+## Overlays and keyboard
+
+<GuideTable>
+
+| Where | What | Breaks |
+| --- | --- | --- |
+| `NavMenu` drawer, `ExportMenu`, `SaveToProject` | No focus trap and no return of focus | [Focus](?path=/docs/design-guide-accessibility--docs) |
+| `NavMenu` drawer | Scroll isn't locked | [Focus](?path=/docs/design-guide-accessibility--docs) |
+| `ExportMenu`, `SaveToProject`, `NavMenu`'s lists, `CorpusBrowser`'s tabs | `role="menu"`, `listbox` or `tab` with no arrow-key support | ARIA pattern for each role |
+| `CorpusBrowser`'s tabs | No `aria-controls` and no `role="tabpanel"` | ARIA tabs pattern |
+| `CostTag` dialog | The backdrop has no fade-in, unlike `ContextSheet`'s identical one | One control, one look |
+| `NavMenu` drawer | The backdrop is `ink-900/30` with no blur; the dialogs use `/40` with blur | One control, one look |
+
+</GuideTable>
+
+<BackdropCompare />
+
+## Structure and semantics
+
+<GuideTable>
+
+| Where | What | Breaks |
+| --- | --- | --- |
+| Every page | `<header>` and `<footer>` sit inside `<main>`, and there is no skip link | [Landmarks](?path=/docs/design-guide-accessibility--docs) |
+| Answer view, `/costs`, `/projects/[slug]` | Heading levels are skipped; the `h1` disappears when the masthead collapses or while a project title is edited | [Headings](?path=/docs/design-guide-accessibility--docs) |
+| Both not-found pages | The title is a `<p>`, so the page has no heading | [Headings](?path=/docs/design-guide-accessibility--docs) |
+| `ProjectHeader`, `SaveToProject` | Text fields with only a placeholder: no `<label>` and no `aria-label` | [Text fields](?path=/docs/design-guide-patterns--docs) |
+| `ProjectView`, note field | The `<label>` isn't tied to the field | [Text fields](?path=/docs/design-guide-patterns--docs) |
+| The rationale in the English interface | Foreign-language text without `lang` | [Language](?path=/docs/design-guide-accessibility--docs) |
+| `SegmentedControl`, `NavMenu` triggers | `h-6` shrinks to 19.2px at "small text" | [Touch targets](?path=/docs/design-guide-accessibility--docs) |
+| Result list, error block, empty message | No `aria-live` region; only the busy indicator's `role="status"` is announced | [Live regions](?path=/docs/design-guide-accessibility--docs) |
+
+</GuideTable>
+
+## Language and microcopy
+
+<GuideTable>
+
+| Where | What |
+| --- | --- |
+| `citation.ts`'s `asPlain` | Wraps the quote in `”…”` regardless of locale, instead of the English `"…"` `format.ts` uses elsewhere |
+
+</GuideTable>
+
+## Code
+
+<GuideTable>
+
+| Where | What |
+| --- | --- |
+| `ExportMenu`, `SaveToProject` | Copy `NavMenu`'s `useCloseOnOutside` inline instead of sharing it |
+| `SimilarPassages`, `MoreFromWork` | Two near-identical neighbor lists |
+| `CostTag`, `PassageAccordion`, `/costs` | The "$ · kr" pair is built by hand in seven places |
+| `/costs`, `/collection` | `StatCard`, `CostComposition`, `LanguageBar` and `EraBars` live inside the page, without stories |
+| `globals.css` | `.streaming-caret` is unused, because `/api/search` no longer streams tokens |
+
+</GuideTable>

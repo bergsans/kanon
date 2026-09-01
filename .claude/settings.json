@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm status)",
+      "Bash(pnpm tsx scripts/.probe-runeberg.ts *)",
+      "Bash(pnpm tsx scripts/.probe-orphans.ts)",
+      "Bash(pnpm tsx scripts/.probe-header-match.ts *)",
+      "Bash(pnpm tsx scripts/.probe-lang-branch.ts)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(sqlite3 data/canon.db *)"
+    ],
+    "ask": [
+      "Bash(pnpm ingest *)",
+      "Bash(pnpm ingest)",
+      "Bash(pnpm eval *)",
+      "Bash(pnpm eval)",
+      "Bash(pnpm build-corpus *)",
+      "Bash(pnpm build-corpus)",
+      "Bash(pnpm build-corpus-sv *)",
+      "Bash(pnpm build-corpus-sv)",
+      "Bash(pnpm build-corpus-mia *)",
+      "Bash(pnpm build-corpus-mia)"
+    ],
+    "deny": [
+      "Read(./.env.local)",
+      "Edit(./src/lib/corpus.json)",
+      "Edit(./src/lib/corpus-sv.json)",
+      "Edit(./src/lib/corpus-mia.json)",
+      "Write(./src/lib/corpus.json)",
+      "Write(./src/lib/corpus-sv.json)",
+      "Write(./src/lib/corpus-mia.json)",
+      "Edit(./data/**)",
+      "Write(./data/**)"
+    ]
+  }
+}

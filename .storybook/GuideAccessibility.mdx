@@ -1,0 +1,76 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { HeadingStaircase } from "./illustrations/HeadingStaircase";
+import { LandmarkTree } from "./illustrations/LandmarkTree";
+import { OverlayMatrix } from "./illustrations/OverlayMatrix";
+import { TouchTargetSquares } from "./illustrations/TouchTargetSquares";
+
+<Meta title="Design guide/Accessibility" />
+
+# Accessibility
+
+Each section states the rule, then shows where the code breaks it.
+`@storybook/addon-a11y` reports violations but doesn't yet fail the build
+(`a11y.test: "todo"`).
+
+## Focus
+
+A single `:focus-visible` rule in `globals.css` (2px `accent-600`, 2px offset)
+covers every button and link. Components don't write their own focus styles;
+the text fields are the one exception, see
+[Patterns](?path=/docs/design-guide-patterns--docs).
+
+A modal traps `Tab`, closes on Escape, and returns focus when it closes. Use
+`useModalFocus`. Only the two dialogs do so today:
+
+<OverlayMatrix />
+
+## Keyboard navigation
+
+A `role="menu"`, `listbox` or `tablist` promises arrow-key movement between
+its items, not just `Tab` landing on each one in turn. `NavMenu`'s menu
+items and its two dropdowns implement it — `ArrowUp`/`ArrowDown` moves,
+`Home`/`End` jumps to the ends — following the ARIA authoring practice for
+each role. That's the model for any future composite widget carrying one of
+those roles. `CorpusBrowser`'s tabs don't have it yet, see
+[Known issues](?path=/docs/design-guide-known-issues--docs).
+
+## Landmarks
+
+A page has one `<main>`. `<header>` and `<footer>` belong outside it, where they
+become landmarks of their own. Today they sit inside `<main>`, and there is no
+skip link.
+
+<LandmarkTree />
+
+## Headings
+
+A page starts at `h1` and never skips a level. The result row is an `h4` on
+purpose, so the row is announced as a heading.
+
+<HeadingStaircase />
+
+Skipped levels are marked with dashes. The `h1` on the search page disappears
+when the masthead collapses, and both not-found pages set their title in a
+`<p>`.
+
+## Language
+
+Text in a language other than the interface's gets its own `lang`. The quote
+and the neighbor lists have one. `ContextSheet`'s extended passage doesn't, nor
+does the Swedish rationale when the interface is in English.
+
+## Live regions
+
+Content that arrives without a click needs `aria-live` or `role="status"` so a
+screen reader announces it unprompted. There is no `aria-live` region anywhere
+in the app: the busy indicator has `role="status"`, but the result list that
+replaces it, the error block and the empty-result message do not.
+
+## Touch targets
+
+At least 24px (WCAG 2.5.8), even at the smallest text size.
+
+<TouchTargetSquares />
+
+`SegmentedControl` and `NavMenu`'s settings triggers are `h-6`, which the
+"small text" setting shrinks to 19.2px.

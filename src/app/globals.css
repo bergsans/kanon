@@ -1,0 +1,280 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /*
+   * Rödkrita (sanguine) — the same drawing cabinet as Silverstift (silverpoint),
+   * the other of its two sticks. Replaces Silverstift in its entirety: the
+   * paper's graphite-grey undertone shifts to a warmer one, and the oxidized
+   * rose-brown accent to sanguine's own hue, which sits more clearly in red
+   * without gaining saturation.
+   *
+   * All eleven variables are measured anew against the same thresholds
+   * Silverstift was set against — WCAG 2.1, body text and accent ≥ 4.5:1,
+   * control outline against the sheet ≥ 3.0:1 (1.4.11) — not scaled or
+   * guessed from the old figures. Silverstift's figures are in parentheses,
+   * since that's what this palette should keep pace with, not just the
+   * requirement:
+   *
+   *   muted text (ink-400) against the ground      6.77   (6.46)
+   *   muted text against the sheet                 7.75   (7.33)
+   *   muted text against the panel                 5.75   (5.55)
+   *   body text (ink-800) against the ground      13.19   (13.15)
+   *   body text against the sheet                 15.11   (14.92)
+   *   quote and heading (ink-900) against the sheet  16.75   (16.43)
+   *   control outline (parchment-300) against the sheet  3.69   (3.56; 1.4.11 requires 3.0)
+   *   accent-600 against the ground                 5.20   (5.38)
+   *   accent-600 against the sheet                  5.96   (6.10)
+   *
+   * The accent sits 0.18 and 0.14 respectively below Silverstift's two
+   * figures and the eight other rows above — sanguine is a touch lighter
+   * than the oxidation was, and that shows precisely in the rows the accent
+   * appears in. Both sit with good margin above 4.5, and the button's text
+   * is the sheet on accent-600, i.e. the same 5.96 as the row above: the
+   * accent carries two roles and both are measured.
+   *
+   * The hairline (parchment-200 against the sheet, 1.99) carries no text and
+   * isn't measured against the text requirement, for the same reason as in
+   * Silverstift: it only separates surfaces, never words.
+   */
+
+  /* The sheet sits close to the ground (1.15:1) by design — the
+     difference is carried by the shadow beneath, not by the tonal gap
+     between them. */
+  --color-parchment-0: #f6f4f0;
+  /* The ground. */
+  --color-parchment-50: #e8e5de;
+  /* Hover and framed panels. */
+  --color-parchment-100: #d8d4ca;
+  /* Hairlines and dividers. */
+  --color-parchment-200: #b4afa2;
+  /* Outlines around something clickable: 3.69:1 against the sheet, above 1.4.11's 3.0. */
+  --color-parchment-300: #837e6f;
+
+  --color-ink-400: #514c44;
+  --color-ink-600: #332f29;
+  --color-ink-800: #211e1a;
+  --color-ink-900: #161410;
+
+  /* Sanguine's own hue: the iron oxide in the stick, muted down to the mark
+     the chalk leaves on paper rather than the pigment's full strength. Carries
+     the same two roles the silverpoint oxidation did — link and button, and
+     the selection's topic/era chip (border + twelve-percent fill over the
+     sheet, same shape as before; only the hue is new, not a second ink). */
+  --color-accent-600: #96453a;
+  --color-accent-700: #70322a;
+
+  /* The sheet's lift. Two shadows: a tight one near the edge that gives the
+     sheet a visible edge, and a wider, fainter one that lays it on the
+     canvas. Ink-coloured, not black — now in ink-900's new tone (22 20 16)
+     instead of silverpoint's graphite (24 22 19), so the shadow follows the
+     ink it belongs to. Alpha and radius are unchanged: a grey shadow on light
+     paper reads wrong regardless of hue, but the exact colour should still be
+     the sheet's own ink. */
+  --shadow-sheet: 0 1px 2px -1px rgb(22 20 16 / 0.07), 0 10px 24px -14px rgb(22 20 16 / 0.16);
+  --shadow-lift: 0 2px 4px -3px rgb(22 20 16 / 0.09), 0 20px 48px -22px rgb(22 20 16 / 0.22);
+
+  /* The corners, flat out. This isn't a measured figure but a visual-language
+     decision — "register in parchment" — and is therefore still set as
+     tokens rather than class by class, for the same reason as before: the
+     sheets, menus and buttons should round by the same amount, and a page
+     where every surface picked its own radius looks thrown together. The
+     figure is now zero across the board.
+     `rounded-full` carries neither of these two tokens and so isn't rounded
+     away here — it splits into two roles. Where the shape carried meaning
+     (the voice line's pulse in `CanonSearch`, the progress bar in
+     `statistik/` and `kostnader/`, the map pin in `CorpusBrowser`) it's left
+     untouched. Where the shape carried a choice — the chip, the language
+     switch, the text size, the provider switch, the project labels — the
+     class has been removed at each individual spot, since Tailwind's fixed
+     9999px scale has no token to set to zero.
+     `--radius` (the bare `rounded` utility) and `--radius-sm` (`rounded-sm`)
+     are zeroed alongside `-md`/`-lg`: eighteen spots — every warning banner,
+     every form field and save button in the two project components, the
+     highlighted match in `CorpusBrowser`, both loading skeletons — used one
+     of those two and stayed at Tailwind's default 0.25rem/0.125rem, rounded
+     while everything drawn in `-md`/`-lg` was already square. */
+  --radius: 0rem;
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-parchment-50);
+  color: var(--color-ink-800);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * The paper's fibre.
+ *
+ * A feTurbulence noise over the entire ground, fixed in the image and behind
+ * all content. The opacity is low by design: 0.035 reads as texture in the
+ * surface but shifts the ground's luminance by less than one step on the
+ * palette's scale, so the contrast ratios above still hold. The noise sits on
+ * the ground and never on the sheets — that's the difference between paper
+ * someone has written on and a texture laid over text.
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Both the line-wrapping and the focus ring live in `base` and not
+   unlayered: Tailwind's utility classes sit in a later layer and need to be
+   able to override them. */
+@layer base {
+  /* The line-wrapping, set once for the whole page instead of per heading.
+     `balance` evens out the short lines in headings and labels — a lone
+     word on the second line under a wordmark is what most makes a page look
+     unhandled. `pretty` applies to body text and removes the widow at the
+     end of a paragraph; it's more expensive to compute and therefore not
+     set on everything. Both fall back to ordinary wrapping where the
+     browser can't do them. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* The focus ring is set globally rather than per control: there are some
+     thirty buttons and links here, and someone tabbing through should never
+     have to guess which one happened to get its own rule. The search box
+     overrides this — it has `outline-none` and its own ring in the accent
+     colour, and two rings on top of each other is no clearer a marker. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-600);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * The results register's small-caps section label. Sixteen headings across
+ * the app — the results list, the archive, the search box's two headings,
+ * the corpus and cost pages, both project views, the neighbor lists —
+ * carried the same five-utility string by hand, and four of them also
+ * carried the trailing hairline that finishes it (`after:h-px after:min-w-4
+ * after:flex-1 after:bg-parchment-200 after:content-['']`). The two had
+ * already drifted: the results register and `SearchBox`'s two headings had
+ * the rule, but the project view's own identical row of the same register
+ * (`ProjectView`) didn't, even though its own comment says a project should
+ * look like the same register as a search. One class each closes that gap
+ * and keeps it closed — `text-xs`, `tracking-widest`, and `ink-600` written
+ * out once instead of six times per file.
+ */
+.eyebrow {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-ink-600);
+}
+
+.eyebrow-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.eyebrow-rule::after {
+  content: "";
+  height: 1px;
+  min-width: 1rem;
+  flex: 1 1 0%;
+  background-color: var(--color-parchment-200);
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent-600) 22%, transparent);
+  color: var(--color-ink-900);
+}
+
+/* Blinking caret at the end of the streaming synthesis. */
+@keyframes caret {
+  0%, 45% { opacity: 1; }
+  55%, 100% { opacity: 0; }
+}
+
+.streaming-caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5ch;
+  height: 1.05em;
+  margin-left: 0.1em;
+  vertical-align: -0.15em;
+  background-color: var(--color-accent-600);
+  animation: caret 1.1s steps(1, end) infinite;
+}
+
+/* The hamburger menu is a classic panel that slides in from the edge, not a
+   small drop-down box — the same motion as a mobile drawer menu. */
+@keyframes menu-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes menu-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-menu-slide-in {
+  animation: menu-slide-in 0.2s ease-out;
+}
+
+.animate-menu-backdrop-in {
+  animation: menu-backdrop-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-caret::after { animation: none; opacity: 1; }
+  .animate-menu-slide-in, .animate-menu-backdrop-in { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/*
+ * This file is also loaded into the Storybook preview (preview.tsx), so
+ * Tailwind's Preflight resets `table`/`th`/`td` there too — the markdown
+ * tables in .storybook/*.mdx lose their borders and cell padding and read
+ * as run-together text. Scoped to `.sbdocs`, the docs addon's own content
+ * wrapper, so the app itself (which has no tables) is untouched.
+ */
+.sbdocs table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.sbdocs th,
+.sbdocs td {
+  border: 1px solid var(--color-parchment-200);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.sbdocs th {
+  color: var(--color-ink-900);
+  font-weight: 600;
+}

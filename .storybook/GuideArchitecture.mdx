@@ -1,0 +1,195 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { GuideTable } from "./illustrations/GuideTable";
+import { PipelineFlow } from "./illustrations/PipelineFlow";
+import { IngestFlow } from "./illustrations/IngestFlow";
+import { TextByReference } from "./illustrations/TextByReference";
+import { ProviderSplit } from "./illustrations/ProviderSplit";
+import { RuntimeBoundary } from "./illustrations/RuntimeBoundary";
+
+<Meta title="Design guide/Architecture" />
+
+# Architecture
+
+How the app works, not how it looks — styling lives on [Design
+principles](?path=/docs/design-guide-principles--docs).
+
+## The big picture
+
+A Swedish question goes in; passages from ~2,690 works come out, each with
+author, work, chapter and a rationale. Three quarters of the collection is
+English, and a Swedish question about "the anxiety of one's own freedom"
+shares no words with Jowett's English Plato. Almost every choice below
+exists to bridge that gap.
+
+The app is two pipelines that meet in one SQLite database:
+
+- **Ingest** runs offline, for hours, once per work. It fetches texts,
+  splits them into passages and turns each passage into a vector.
+- **Search** runs per question, in seconds. It reads that database and never
+  writes to the collection.
+
+Read them in that order: the search only makes sense once you know what
+ingest left behind.
+
+## 1. Getting a text into the collection
+
+`scripts/ingest.ts`, one work at a time:
+
+<IngestFlow />
+
+- **Fetch and verify.** The text is checked against *that source's own* file
+  header, never a catalog. Perseus's catalog says "Appianus of Alexandria"
+  where the file says "Appian", and sixteen legitimate works were once
+  aborted on that difference. Rights checks run here too, on every run.
+- **Chunk.** `chunk.ts` splits paragraphs and detects headings with rules per
+  language. Front matter is stored for context but never embedded, and
+  every search branch excludes it.
+- **Embed.** `embed.ts` uses the same multilingual model the question is
+  later embedded with. A shared model means a shared vector space — the only
+  reason a Swedish question can land near English prose at all.
+- **Index.** `chunk_count` is written last, so a work with a count above zero
+  is known to be complete and is skipped on the next run.
+
+## 2. Shape of the data
+
+<TextByReference />
+
+`chunks` is the only table that holds passage text. Everything that refers to
+a passage — a saved search, a passage saved to a project, a translation —
+stores its `chunk_id` instead of a copy, because a copy goes stale the moment
+a work is re-indexed.
+
+The catch: re-indexing *reuses* chunk ids, so row 4711 can become a
+different passage. Each reference therefore also stores a `text_hash` of the
+text it was made from. A hash that no longer matches counts as a miss, never
+as the new text — otherwise a project would silently quote the wrong
+passage.
+
+## 3. The search pipeline
+
+<PipelineFlow />
+
+`src/app/api/search/route.ts` drives it, `src/lib/search.ts` does most of the
+work. Each stage answers a problem the previous one left:
+
+<GuideTable>
+
+| Stage | Problem it solves | What it does | Cost |
+| --- | --- | --- | --- |
+| **0. Cache** | The same question twice should not cost twice | Verbatim match, then vector similarity ≥ 0.95 against earlier questions | Free |
+| **1. Expansion** | A short Swedish question sits far from English 19th-century prose in vector space | Claude writes 9 hypothetical answer passages (HyDE): 4 English registers plus 1 per other language. Also keywords, the question translated, and any authors or works it names | ~$0.021 |
+| **2. Hybrid retrieval** | Vectors miss exact terms; keywords miss meaning | 9 vector branches + BM25 + a mention branch, merged with RRF. Genre/era filters apply *inside every branch* | Free, local |
+| **3. Cross-encoder** | Retrieval is fast but coarse | A local model reads question and passage together and scores 192 candidates. *Then* diversify caps each work at 3 and each author at 4 per 28 | Free, ~12 s |
+| **4. Claude's selection** | A score is not an answer | Claude reads 64 candidates, keeps the ones that actually answer, and justifies each. No target count | ~$0.12 |
+
+</GuideTable>
+
+Two orderings look arbitrary and are not:
+
+- **Filter inside the branch, not after the merge.** Religion is 2.7% of the
+  collection; an unfiltered branch rarely has any in its first hundred hits,
+  so filtering afterward leaves almost nothing to filter.
+- **Cross-encoder before diversify.** Cap first, and a work's best passage
+  can be dropped in favor of two worse ones that happened to rank higher in
+  the merge.
+
+And one that cannot be trimmed: **one vector branch per language.** The
+embedding model groups text by language before meaning — 98–100 of a
+passage's 100 nearest neighbors share its language. Drop a branch and that
+language doesn't get slower to find; it can't be found.
+
+Every number here has a measurement behind it, linked from `README.md`'s
+"How search works" and logged in `docs/measurements/`.
+
+<GuideTable>
+
+| Term | In one line |
+| --- | --- |
+| HyDE | Search with a made-up answer instead of the question — an answer looks more like the passages you want |
+| BM25 | Classic keyword ranking (SQLite FTS5) |
+| RRF | Reciprocal Rank Fusion: merge ranked lists by position, not by their incomparable scores |
+| Cross-encoder | A model that reads question and passage as one input — slower than vectors, much sharper |
+| NDJSON | One JSON object per line, so the client can render each event as it arrives |
+
+</GuideTable>
+
+## 4. One request, one stream
+
+`CanonSearch` posts to `POST /api/search` and reads back NDJSON — one
+`SearchEvent` (`src/lib/protocol.ts`) per line. That is why the
+interpretation of the question shows while stages 3 and 4 still run. The
+client's phases — `idle` → `expanding` → `retrieving` → `reading` → `done`,
+plus the cached and empty shortcuts — have their own figure on
+[Patterns](?path=/docs/design-guide-patterns--docs).
+
+## 5. Two providers, one pipeline
+
+<ProviderSplit />
+
+A cookie picks the model for the two LLM stages, 1 and 4. Everything else —
+cache, retrieval, cross-encoder — is identical. `local.ts` reuses
+`claude.ts`'s prompts, schemas and parsing; only the model differs.
+
+The one number that changes is the pool handed to stage 4: Claude gets 64,
+a local model 28. Claude's 64 comes from a later measurement; 28 is the
+only pool size ever measured for a local model, so it stays until someone
+measures again.
+
+<GuideTable>
+
+| Route | Models | Status |
+| --- | --- | --- |
+| Claude (default) | `claude-sonnet-5` | The chain everything above is measured against |
+| Ollama, `/api/chat` | `qwen3:14b`, `qwen3:8b`, `gemma3:12b` | `qwen3:14b` measured against Sonnet: 38% shared selected passages (46/122 across eight questions), one question selected zero passages despite strong candidates present |
+| OpenAI-compatible, `/v1/chat/completions` | `mlx-serve` at three quantizations | Offered in the switch, not yet measured |
+
+</GuideTable>
+
+No one lands on a local model without choosing it — see `DEFAULT_MODEL` in
+`provider.ts`. Full comparison: `docs/measurements/local-model.md`.
+
+## 6. The runtime boundary
+
+<RuntimeBoundary />
+
+`better-sqlite3`, `sqlite-vec` and `onnxruntime-node` are native modules,
+and native modules don't run on the edge. So every route that touches the
+database or a model says so explicitly:
+
+```ts
+export const runtime = "nodejs";
+```
+
+The exception proves the rule: `api/search/cancel` touches neither, and
+deliberately has no such line.
+
+## 7. Where components live
+
+Three folders under `src/app/components/`: `providers/` wraps the app once,
+`smart-compositions/` owns fetch and server actions, and `ui/` takes props
+and returns JSX. Imports go one way — a `ui/` component never imports a
+smart composition. Diagram and full rule: [Design
+principles](?path=/docs/design-guide-principles--docs).
+
+## Map
+
+<GuideTable>
+
+| Module | What |
+| --- | --- |
+| `src/lib/taxonomy.ts` | Genre, era, source, language, `CanonWork` — without the manifest in tow |
+| `src/lib/corpus.ts` | Merges the ten manifests, `WORK_BY_ID`, `sourceLink` |
+| `src/lib/corpus*.json` | Generated by `scripts/build-corpus*.ts` — never edited by hand |
+| `src/lib/db.ts` | Schema, migrations, `vecKey`/`vecBlob`, singleton handle |
+| `src/lib/search.ts` | Branches, the topic/era filter, RRF, the cross-encoder call, `diversify`, `getContext` |
+| `src/lib/claude.ts` | The two Claude steps, price and cache tables, `logUsage` |
+| `src/lib/local.ts` | The same two steps against a local model, over Ollama or an OpenAI-compatible endpoint |
+| `src/lib/provider.ts` / `provider-server.ts` | The model switch: `ModelId`, the cookie, effort levels |
+| `src/lib/protocol.ts` | The wire types between `/api/search` and the client |
+| `src/lib/searches.ts` | Permalink and the semantic cache |
+| `src/lib/citation.ts` | Citation export — pure functions, no server |
+
+</GuideTable>
+
+The full map, including every ingestion source and probe script, is in
+`AGENTS.md`.

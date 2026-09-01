@@ -1,0 +1,124 @@
+import { ColorItem, ColorPalette, Meta, Story } from "@storybook/addon-docs/blocks";
+import * as PassageAccordionStories from "../src/app/components/smart-compositions/PassageAccordion.stories";
+import * as SearchBoxStories from "../src/app/components/ui/SearchBox.stories";
+import * as TextSizeSwitchStories from "../src/app/components/ui/TextSizeSwitch.stories";
+import { ContrastPairs } from "./illustrations/ContrastPairs";
+import { GlyphGrid } from "./illustrations/GlyphGrid";
+import { InkByRole } from "./illustrations/InkByRole";
+import { NumeralTreatments } from "./illustrations/NumeralTreatments";
+import { OpacityRamp } from "./illustrations/OpacityRamp";
+import { ParchmentByRole } from "./illustrations/ParchmentByRole";
+import { TypeScaleLadder } from "./illustrations/TypeScaleLadder";
+
+<Meta title="Design guide/Foundations/Color" />
+
+# Color and type
+
+## The palette
+
+Eleven tokens, defined in `@theme` in `globals.css`. Source code uses tokens,
+never hex values.
+
+<ColorPalette>
+  <ColorItem
+    title="parchment"
+    subtitle="0 sheet · 50 ground · 100 hover, panel · 200 hairline · 300 outline"
+    colors={{
+      "0": "var(--color-parchment-0)",
+      "50": "var(--color-parchment-50)",
+      "100": "var(--color-parchment-100)",
+      "200": "var(--color-parchment-200)",
+      "300": "var(--color-parchment-300)",
+    }}
+  />
+  <ColorItem
+    title="ink"
+    subtitle="400 muted · 600 secondary · 800 default · 900 heading, quote"
+    colors={{
+      "400": "var(--color-ink-400)",
+      "600": "var(--color-ink-600)",
+      "800": "var(--color-ink-800)",
+      "900": "var(--color-ink-900)",
+    }}
+  />
+  <ColorItem
+    title="accent"
+    subtitle="Red chalk: 600 mark, link, button · 700 hover, text on a tint"
+    colors={{ "600": "var(--color-accent-600)", "700": "var(--color-accent-700)" }}
+  />
+</ColorPalette>
+
+## Two typefaces, one rule
+
+Serif is the collection's voice — the passage, the quote, a work's title.
+Sans is the app's — buttons, labels, metadata, years. Real components, not
+a specimen invented for this page:
+
+<Story of={PassageAccordionStories.Open} />
+
+<Story of={SearchBoxStories.Empty} />
+
+Both tokens are plain OS system stacks today, chosen for being everywhere
+rather than for how they look — see
+[Foundations/Typography](?path=/docs/design-guide-foundations-typography--docs)
+for candidate replacements, shown on these same two components.
+
+## Which text may sit on which surface
+
+Text needs a contrast of 4.5:1 and a control's outline needs 3:1. The figures
+come from the measurements in the `@theme` comment; if a token changes, measure
+again there first.
+
+<ContrastPairs />
+
+## Ink by role
+
+Headings and quotes use `ink-900`. `body` sets `ink-800` as the default.
+Secondary text such as rationales and titles uses `ink-600`. Metadata, counts,
+placeholders and resting icons use `ink-400`, the one muted tone.
+
+<InkByRole />
+
+## Parchment by role
+
+The page's ground and an unselected chip share `parchment-50`, and the sheet
+(`parchment-0`) sits above both. The sheet is only a slightly lighter tone than
+the ground, so the shadow does the work of separating them, not the color.
+
+<ParchmentByRole />
+
+## Opacity steps
+
+Accent tints come from this set. A new fraction needs a reason none of these
+already fits.
+
+<OpacityRamp />
+
+## Type scale
+
+Every size is in `rem`, so the text-size setting scales the whole document
+through a single lever: the root's `font-size`, at 80, 100 or 120%. A size
+written in `px` isn't scaled by it.
+
+<TypeScaleLadder />
+
+<Story of={TextSizeSwitchStories.Default} />
+
+Drama and verse get no hyphenation, because the poet chose where each line
+breaks.
+
+## Numerals
+
+A number that lines up in a column, such as money, the stopwatch or the cost
+table, uses `tabular-nums`. A number inside running text, such as a year or a
+verse number inside the quote, uses old-style figures instead — set in the
+serif face, the way a printed edition would set it.
+
+<NumeralTreatments />
+
+## Glyphs
+
+A closed set. Most of them are hidden from screen readers, because the same
+meaning is already given in words next to them.
+
+<GlyphGrid />

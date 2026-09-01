@@ -1,0 +1,41 @@
+[
+ {
+  "id": "mia-antonio-gramsci",
+  "source": "marxists",
+  "sourceId": "/archive/gramsci/index.htm",
+  "author": "Antonio Gramsci",
+  "title": "Politiska skrifter 1916–1936",
+  "genre": "politik",
+  "language": "en",
+  "year": 1937,
+  "era": "1900-tal",
+  "titleMatch": "",
+  "authorMatch": "gramsci",
+  "parts": [
+   "/archive/gramsci/schucht-letter.htm",
+   "/archive/gramsci/1916/12/newspapers.htm",
+   "/archive/gramsci/1917/03/character.htm",
+   "/archive/gramsci/1917/12/revolution-against-capital.htm",
+   "/archive/gramsci/1917/12/revolution-against-capital-alt.htm",
+   "/archive/gramsci/1918/03/one-year.htm",
+   "/archive/gramsci/1919/04/red-ink.htm",
+   "/archive/gramsci/1919/06/price-history.htm",
+   "/archive/gramsci/1919/10/unions-councils.htm",
+   "/archive/gramsci/1919/10/unions-dictatorship.htm",
+   "/archive/gramsci/1919/11/elections.htm",
+   "/archive/gramsci/1920/01/workers-peasants.htm",
+   "/archive/gramsci/1920/12/split-disorder.htm",
+   "/archive/gramsci/1921/03/turin_councils.htm",
+   "/archive/gramsci/1921/05/flesh-blood.htm",
+   "/archive/gramsci/1921/08/two_fascisms.htm",
+   "/archive/gramsci/1921/09/parties-masses.htm",
+   "/archive/gramsci/1924/10/fascism-liberalism.htm",
+   "/archive/gramsci/1925/05/speech.htm",
+   "/archive/gramsci/1925/07/maximalism.htm",
+   "/archive/gramsci/1925/09/sterile-negative.htm",
+   "/archive/gramsci/1925/12/operations.htm",
+   "/archive/gramsci/1926/10/letter-togliatti.htm",
+   "/archive/gramsci/1936/letter-giuliano.htm"
+  ]
+ }
+]

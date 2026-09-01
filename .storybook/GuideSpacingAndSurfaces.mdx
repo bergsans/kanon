@@ -1,0 +1,76 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { BreakpointRuler } from "./illustrations/BreakpointRuler";
+import { GuideTable } from "./illustrations/GuideTable";
+import { MotionSamples } from "./illustrations/MotionSamples";
+import { PageShellWireframe } from "./illustrations/PageShellWireframe";
+import { ShadowSamples } from "./illustrations/ShadowSamples";
+import { ZIndexStack } from "./illustrations/ZIndexStack";
+
+<Meta title="Design guide/Foundations/Layout" />
+
+# Spacing and surfaces
+
+## The page shell
+
+Every route shares one shell and one of three widths. The two search pages are
+the only ones with two columns.
+
+<PageShellWireframe />
+
+## Breakpoints
+
+The layout switches only at `sm` and `lg`, and Storybook's viewports are built
+around those two. A third breakpoint needs a reason.
+
+<BreakpointRuler />
+
+## Responsive behaviour
+
+The layout changes shape, not just size, at exactly two places:
+
+<GuideTable>
+
+| Component | `sm` (640px) | `lg` (1024px) |
+| --- | --- | --- |
+| `RecentSearches` | — | becomes a left-bordered column (`lg:border-l`) instead of a top-bordered block |
+| `CorpusBrowser` | splits into a two-column grid (`sm:grid-cols-[13rem_minmax(0,1fr)]`) | — |
+| `NavMenu` | trigger moves in from the edge (`sm:right-6 sm:top-6`), panel widens to `sm:w-80` | — |
+| The page shell | — | splits into two columns (`lg:grid-cols-[minmax(0,1fr)_15rem]`); the aside becomes `lg:sticky` |
+
+</GuideTable>
+
+Everything else that changes at `sm`/`lg` is a size — type scale, width —
+not a shape.
+
+## Shadows
+
+Two tokens: `shadow-sheet` for a surface that rests on the page, `shadow-lift`
+for one that floats above it, such as a menu, a dialog or the search box.
+
+<ShadowSamples />
+
+## Layers
+
+Three `z-index` layers. Popovers sit at `z-20`, the menu trigger and its
+backdrop at `z-40`, and anything that covers the page at `z-50`.
+
+<ZIndexStack />
+
+## Motion
+
+Only where it explains a change of place or a wait:
+
+<GuideTable>
+
+| Animation | Where |
+| --- | --- |
+| `menu-slide-in`, `menu-backdrop-in` (0.2s) | the menu drawer and its backdrop |
+| `animate-ping` | the dot that shows a search in progress |
+| `animate-pulse` | loading skeletons |
+
+</GuideTable>
+
+<MotionSamples />
+
+Every animation is switched off under `prefers-reduced-motion: reduce`. A new
+animation isn't done until it is covered by that rule.

@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { EmptyStateAnatomy } from "./illustrations/EmptyStateAnatomy";
+import { GuideTable } from "./illustrations/GuideTable";
+import { VoiceStatePairs } from "./illustrations/VoiceStatePairs";
+
+<Meta title="Design guide/Voice and tone" />
+
+# Content and voice
+
+Every string comes from `src/lib/i18n.ts`, never a component. Swedish is
+primary (`DEFAULT_LOCALE` `"sv"`); English mirrors it, not an independent
+voice — both typed against the same `Key` union, so a string missing from
+either fails `pnpm typecheck`.
+
+## Sentence case, not title case
+
+`"Ställ en fråga…"` / `"Ask a question…"`, never "Ask A Question".
+
+## An ellipsis marks a wait, nothing else
+
+Three dots (`…`) appear only while something is still happening, and
+vanish the moment it's done — a finished state is one word, not a
+continuation of the busy sentence. Same discipline for "no charge": one
+idiom, never a second word drifting in beside it.
+
+<VoiceStatePairs />
+
+## An empty result always names the next step
+
+`result.empty` and `result.emptyFiltered` are two sentences split at the
+same seam — what's missing, then what to do about it:
+
+<EmptyStateAnatomy />
+
+The same seam repeats at every other empty state (`corpus.filter.none`,
+`searches.filter.none`, `work.none`, `similar.none`): a suggested action,
+never just "No results."
+
+## Errors are named, not coded
+
+`result.errorTitle`: `"Något gick fel"` / `"Something went wrong"` — plain
+language, no status code, in the message itself. Any technical detail is a
+separate second sentence (`result.serverSaid`).
+
+## A destructive confirmation states the consequence
+
+`project.deleteConfirm` doesn't ask "Are you sure?" — it says what
+survives and what doesn't:
+
+<GuideTable>
+
+| Swedish | English |
+| --- | --- |
+| `"Ta bort projektet och alla anteckningar i det?"` | `"Delete the project and every note in it?"` |
+| `"Styckena finns kvar i samlingen."` | `"The passages remain in the collection."` |
+
+</GuideTable>
+
+## Numbers, money and dates follow the locale, not a format string
+
+`bcp47()` maps `sv` to `sv-SE` and `en` to `en-GB` — not `en-US` — because
+the app counts in kronor and writes dates ISO-like: an American date or a
+comma-grouped thousand would be wrong, not merely unfamiliar. Always
+`Intl`, never a hand-built format string.
+
+## Where the rule already breaks
+
+`citation.ts`'s `asPlain` wraps every quote in `”…”` regardless of locale,
+instead of switching to English `"…"`. See [Known
+issues](?path=/docs/design-guide-known-issues--docs).

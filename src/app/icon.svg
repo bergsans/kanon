@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
+  <!--
+    Flikikonen ritas mot en fylld platta, inte som en fristående kontur.
+    En kontur i accent-600 försvinner mot en mörk flikrad i webbläsaren;
+    plattan bär sin egen grund och ser likadan ut i båda temana.
+    Färgerna är accent-600 och parchment-0 ur globals.css skrivna som hex —
+    filen serveras statiskt av Next och ser aldrig Tailwinds @theme.
+    Nästan raka hörn: märket ska läsas som ett block man skurit i, inte som
+    en appikon med tecknet placerat ovanpå.
+  -->
+  <rect width="32" height="32" rx="1" fill="#96453a" />
+  <!--
+    Styckentecknet, rubrikatorns märke för var ett stycke tar vid — appen
+    delar ut stycken, inte böcker. Stammarna löper ut genom plattans
+    underkant så att tecknet blir ett snitt i ytan och inte en form på den.
+
+    Varje kant ligger på en jämn enhet. Vid 16 px är en pixel två enheter,
+    och med stammar på halva enheter hamnade de mitt över pixelgränserna:
+    i en 16×16-rendering blev de blekrosa i stället för ljusa och tecknet
+    lästes som en skål med brus under. Nu är varje stam exakt två pixlar och
+    springan mellan dem exakt en — plattans rött som syns igenom, samma skäl
+    som ett hål behåller kontrasten där ett tunt streck gråas ut.
+    Bara skålens rundning kantutjämnas, och den tål det.
+  -->
+  <path fill="#f6f4f0" d="M24 6H16A6 6 0 0 0 16 18H14V32H18V18H20V32H24Z" />
+</svg>

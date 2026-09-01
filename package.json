@@ -1,0 +1,75 @@
+{
+  "name": "canon",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "ingest": "tsx scripts/ingest.ts",
+    "status": "tsx scripts/status.ts",
+    "eval": "tsx --env-file-if-exists=.env.local scripts/eval.ts",
+    "probe-rerank-local": "tsx --env-file-if-exists=.env.local scripts/.probe-rerank-local.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "build-corpus": "tsx scripts/build-corpus.ts",
+    "build-corpus-sv": "tsx scripts/build-corpus-sv.ts",
+    "build-corpus-mia": "tsx scripts/build-corpus-mia.ts",
+    "build-corpus-perseus": "tsx scripts/build-corpus-perseus.ts",
+    "build-corpus-tcp": "tsx scripts/build-corpus-tcp.ts",
+    "build-corpus-dta": "tsx scripts/build-corpus-dta.ts",
+    "build-corpus-fr": "tsx scripts/build-corpus-fr.ts",
+    "build-corpus-it": "tsx scripts/build-corpus-it.ts",
+    "build-corpus-de": "tsx scripts/build-corpus-de.ts",
+    "build-corpus-ws": "tsx scripts/build-corpus-ws.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.122.0",
+    "@huggingface/transformers": "4.2.0",
+    "better-sqlite3": "13.0.3",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "sqlite-vec": "0.1.9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "onnxruntime-node",
+      "protobufjs",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/nextjs": "10.6.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/better-sqlite3": "9.6.0",
+    "@types/d3-hierarchy": "3.1.7",
+    "@types/d3-scale": "4.0.9",
+    "@types/node": "26.4.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "d3-hierarchy": "3.1.2",
+    "d3-scale": "4.0.2",
+    "msw": "2.15.0",
+    "msw-storybook-addon": "3.0.0",
+    "postcss": "8.5.26",
+    "remark-gfm": "4.0.1",
+    "storybook": "10.6.0",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}

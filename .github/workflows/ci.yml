@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      # Every route is dynamic (`force-dynamic` or `dynamic = "force-dynamic"`
+      # throughout src/app/), so nothing here touches the database, an API
+      # key, or the embedding/rerank models at build time — confirmed
+      # locally: the "Generating static pages" step finishes in well under a
+      # second, too fast to have loaded either model. No `data/` and no
+      # `ANTHROPIC_API_KEY` needed for this step to pass.
+      - run: pnpm build
+      # ESLint isn't wired up yet: typescript-eslint 8.70.0 (latest) hard-fails
+      # against this project's pinned TypeScript 7.0.2 — its peer range caps
+      # at <6.1.0 with no override, tracked at
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940.
+      # Add a lint step here once that's resolved upstream.

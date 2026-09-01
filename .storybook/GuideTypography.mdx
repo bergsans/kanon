@@ -1,0 +1,95 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { ALL_PAIRINGS } from "./illustrations/candidateFonts";
+import { DiacriticsTable, FontSizeTable, TypographyLab } from "./illustrations/FontPairingPreview";
+
+<Meta title="Design guide/Foundations/Typography" />
+
+# Typography
+
+`--font-serif` and `--font-sans` in `globals.css` are OS system stacks today —
+Iowan Old Style falling back to Georgia, `ui-sans-serif` falling back to the
+platform default. Neither was chosen for how it looks, only for being
+everywhere. This page weighs five replacement pairings against that baseline.
+**None is adopted yet.**
+
+The candidates lean toward the canon's own printing history rather than UI
+fashion: a Garamond or Caslon revival for the serif, the lineage most of the
+collection was actually set in, kept quiet by a restrained grotesque on the
+sans side. Elegant here means fitting the subject.
+
+## The candidates
+
+Each pairing as a set — the app's rule is a matched serif and sans, so a
+proposal only means something as a pair. **Click a card** to render the page
+mockup below in that pairing; the card marked "live today" is the current
+stack, and whichever card is marked "shown below" is what the mockup is
+currently set in.
+
+<TypographyLab pairings={ALL_PAIRINGS} />
+
+## Role by role
+
+The mockup above shows one pairing at once; these tables put all six side by
+side, one real [type-scale](?path=/docs/design-guide-foundations-color--docs)
+role at a time, with a string the app actually shows there — useful once a
+mockup click has narrowed the field to two or three candidates worth
+comparing directly.
+
+<FontSizeTable
+  px={36}
+  family="serif"
+  cls="text-4xl"
+  role="page h1"
+  sample="Kanon"
+  pairings={ALL_PAIRINGS}
+/>
+
+<FontSizeTable
+  px={20}
+  family="serif"
+  cls="text-xl"
+  role="the question field, serif headings"
+  sample="Är makt viktigare än moral för en furste?"
+  pairings={ALL_PAIRINGS}
+/>
+
+<FontSizeTable
+  px={17}
+  family="serif"
+  cls="text-[1.0625rem]"
+  role="quote, context prose, row titles"
+  sample="Of things some are in our power, and others are not."
+  pairings={ALL_PAIRINGS}
+/>
+
+<FontSizeTable
+  px={14}
+  family="sans"
+  cls="text-sm"
+  role="body copy, teasers, rationale"
+  sample="Appen letar upp de stycken ur västerlandets kanon som bär på ett svar."
+  pairings={ALL_PAIRINGS}
+/>
+
+<FontSizeTable
+  px={12}
+  family="sans"
+  cls="text-xs"
+  role="chrome: labels, metadata, links"
+  sample="Ställ en fråga · Exportera · Textstorlek · 2 690 verk"
+  pairings={ALL_PAIRINGS}
+/>
+
+## Diacritics
+
+The interface is Swedish and the collection spans six languages. A face that
+draws å, ß or œ poorly is out, however good its English looks.
+
+<DiacriticsTable pairings={ALL_PAIRINGS} />
+
+## Trying another pairing
+
+The fonts load through `next/font/google`, self-hosted at build time, so a new
+candidate costs one entry in
+[candidateFonts.ts](./illustrations/candidateFonts.ts) and nothing at runtime.
+Adopting one means changing the two tokens in `@theme` in `globals.css`.
